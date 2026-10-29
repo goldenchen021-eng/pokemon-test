@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>穿越宝可梦 · 你的初始宝可梦人格</title>
+<meta name="description" content="15 道穿越难题，测出与你灵魂同频的那只宝可梦。结果可截图分享。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23FF4D6D'/%3E%3Cpath d='M4 50 a46 46 0 0 0 92 0 Z' fill='%23fff'/%3E%3Crect x='4' y='46' width='92' height='8' fill='%230B1830'/%3E%3Ccircle cx='50' cy='50' r='14' fill='%23fff' stroke='%230B1830' stroke-width='7'/%3E%3C/svg%3E">
+<style>
+/* ============ tokens ============ */
+:root{
+  --bg0:#071021; --bg1:#0B1830; --bg2:#10233F;
+  --ink:#F6F9FF; --ink2:#C2CDEC; --ink3:#7E8DB6;
+  --red:#FF4D6D; --red-deep:#E23352; --red-soft:rgba(255,77,109,.16);
+  --blue:#38C7FF; --blue-soft:rgba(56,199,255,.16);
+  --amber:#FFC83D; --amber-soft:rgba(255,200,61,.14);
+  --line:rgba(255,255,255,.10);
+  --card:rgba(255,255,255,.045);
+  --grad-hot:linear-gradient(90deg,#FF4D6D,#FF9A5C 55%,#FFC83D);
+  --grad-cool:linear-gradient(90deg,#38C7FF,#7B6CFF);
+  --r-lg:22px; --r-md:16px; --r-sm:12px;
+  --ease:cubic-bezier(.22,.9,.28,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:url('assets/bg_cover2.png') center 24% / cover no-repeat fixed, var(--bg0);
+  color:var(--ink); min-height:100vh;
+  -webkit-font-smoothing:antialiased; line-height:1.5; overflow-x:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+::selection{background:var(--red);color:#fff}
+
+/* ============ adventure background + readability overlay ============ */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background:
+    linear-gradient(180deg, rgba(9,18,38,.36) 0%, rgba(9,18,38,.14) 38%, rgba(9,18,38,.24) 68%, rgba(9,18,38,.5) 100%),
+    radial-gradient(120% 90% at 50% 0%, rgba(8,16,34,.20), transparent 55%);
+}
+.bg .deco{position:absolute;opacity:.5;animation:drift 6s ease-in-out infinite}
+.bg .deco svg{display:block;width:100%;height:100%}
+.bg .deco.d1{width:56px;height:56px;left:6%;top:14%;opacity:.42}
+.bg .deco.d2{width:38px;height:38px;right:8%;top:34%;opacity:.36;animation-delay:1.1s}
+.bg .deco.d3{width:46px;height:46px;left:12%;bottom:16%;opacity:.32;animation-delay:.6s}
+.bg .deco.d4{width:30px;height:30px;right:10%;bottom:26%;opacity:.28;animation-delay:1.7s}
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
+
+/* ============ app shell ============ */
+#app{position:relative;z-index:1;max-width:540px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.view{display:none;flex:1;flex-direction:column;padding:22px 20px 34px}
+.view.active{display:flex;animation:rise .5s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* 答题页：明亮像素海岛背景（图片1风格） */
+#viewQuiz{position:relative;padding:18px 16px 34px}
+#viewQuiz::before{content:"";position:fixed;inset:0;z-index:0;background:url('assets/bg_cover2.png') center / cover no-repeat, var(--bg0)}
+#viewQuiz::after{content:"";position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 30%,rgba(8,28,18,.16) 100%);pointer-events:none}
+#viewQuiz > *{position:relative;z-index:1}
+.letter{position:relative;background:linear-gradient(170deg,#fcf2dc,#f2e1bc);border:1px solid #e3cfa5;
+  border-radius:16px;padding:20px 18px 16px;margin-bottom:18px;
+  box-shadow:0 20px 40px rgba(18,40,24,.32), inset 0 0 0 1px rgba(255,255,255,.5);
+  transform:rotate(-.4deg)}
+.letter::before{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;
+  background:repeating-linear-gradient(transparent,transparent 27px, rgba(168,104,58,.09) 28px)}
+.l-tape{position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-2deg);width:94px;height:28px;z-index:3;
+  background:rgba(214,190,140,.94);border-left:1px dashed rgba(120,95,55,.3);border-right:1px dashed rgba(120,95,55,.3);
+  box-shadow:0 3px 6px rgba(90,60,25,.22)}
+/* 背景散布的宝可梦点缀（像参考图里岛屿上的伙伴） */
+
+/* ============ shared bits ============ */
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;color:var(--ink2);
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;background:rgba(255,255,255,.03)}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red)}
+.btn-primary{
+  width:100%;max-width:340px;border-radius:999px;padding:17px 22px;font-size:17px;font-weight:800;color:#fff;
+  background:var(--grad-hot);letter-spacing:.02em;box-shadow:0 14px 34px rgba(255,77,109,.34);
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease);
+}
+.btn-primary:active{transform:scale(.97)}
+.btn-ghost{width:100%;max-width:340px;border-radius:999px;padding:14px 20px;font-size:15px;font-weight:700;color:var(--ink2);
+  border:1px solid var(--line);background:rgba(255,255,255,.03);transition:transform .18s var(--ease),border-color .18s}
+.btn-ghost:active{transform:scale(.97)}
+#toast{
+  position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);z-index:60;background:rgba(11,24,48,.96);
+  border:1px solid var(--line);color:var(--ink);padding:12px 20px;border-radius:12px;font-size:14px;opacity:0;
+  pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:86vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ============ intro ============ */
+#viewIntro{align-items:center;justify-content:center;text-align:center;padding-top:40px;padding-bottom:40px}
+.brand-tag{margin-bottom:18px}
+.cover-title{width:100%;max-width:430px;margin:2px auto 14px;filter:drop-shadow(0 5px 10px rgba(0,0,0,.42))}
+.cover-roster{position:relative;width:100%;max-width:430px;margin:2px auto 26px;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding-bottom:10px}
+.cover-roster::before{content:"";position:absolute;left:2%;right:2%;bottom:0;height:15px;border-radius:999px;background:linear-gradient(180deg,rgba(86,168,74,.62),rgba(32,96,46,.40));filter:blur(1px)}
+.cover-roster::after{content:"";position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);width:70%;height:30px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.30),transparent 70%);filter:blur(4px)}
+.cover-roster img{position:relative;height:60px;width:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.30));animation:float 4s ease-in-out infinite}
+.cover-roster img:nth-child(1){height:52px;margin-bottom:4px;animation-delay:.4s}
+.cover-roster img:nth-child(2){height:56px;animation-delay:.9s}
+.cover-roster img:nth-child(3){height:72px;animation-delay:.1s}
+.cover-roster img:nth-child(4){height:58px;animation-delay:.7s}
+.cover-roster img:nth-child(5){height:48px;margin-bottom:6px;animation-delay:1.2s}
+.cover-roster img:nth-child(6){height:64px;animation-delay:.3s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
+.kicker{font-size:12px;letter-spacing:.32em;color:#fff;margin-bottom:16px;font-weight:800;text-shadow:1px 1px 0 #16261a,-1px 1px 0 #16261a,1px -1px 0 #16261a,-1px -1px 0 #16261a,0 0 3px rgba(15,25,18,.5),0 1px 4px rgba(15,25,18,.55)}
+h1{font-size:40px;line-height:1.18;font-weight:900;letter-spacing:.01em;margin-bottom:16px}
+h1 .hl{background:var(--grad-hot);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{font-size:16px;color:#fff;max-width:300px;margin:0 auto 30px;text-shadow:1px 1px 0 #16261a,-1px 1px 0 #16261a,1px -1px 0 #16261a,-1px -1px 0 #16261a,0 0 4px rgba(15,25,18,.5),0 2px 5px rgba(15,25,18,.55);font-weight:800}
+.meta{display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;color:#fff;margin-bottom:26px;text-shadow:1px 1px 0 #16261a,-1px 1px 0 #16261a,1px -1px 0 #16261a,-1px -1px 0 #16261a,0 0 3px rgba(15,25,18,.5),0 1px 4px rgba(15,25,18,.55);font-weight:800}
+.meta b{color:var(--amber);font-weight:800}
+.meta .sep{width:3px;height:3px;border-radius:50%;background:var(--ink3);opacity:.5}
+.note{margin-top:22px;font-size:12px;color:#fff;text-shadow:1px 1px 0 #16261a,-1px 1px 0 #16261a,1px -1px 0 #16261a,-1px -1px 0 #16261a,0 0 3px rgba(15,25,18,.5),0 1px 4px rgba(15,25,18,.55);font-weight:800}
+
+/* ============ quiz ============ */
+.quiz-top{display:flex;align-items:center;gap:14px;margin-bottom:20px;background:linear-gradient(180deg,#F7E9CB,#EAD5A8);border:1px solid rgba(150,110,60,.28);border-radius:18px;padding:12px 14px;box-shadow:0 8px 22px rgba(60,45,15,.14)}
+.back{width:38px;height:38px;flex:none;border-radius:12px;border:1px solid rgba(40,60,90,.14);display:grid;place-items:center;background:#fff}
+.back svg{width:18px;height:18px;stroke:#33405E}
+.count{font-size:13px;color:#5A6B8C;font-weight:800;letter-spacing:.06em;white-space:nowrap}
+.progress{position:relative;flex:1;height:7px;border-radius:999px;background:rgba(40,60,90,.10);overflow:visible}
+.progress i{display:block;height:100%;width:0;border-radius:999px;background:var(--grad-hot);transition:width .45s var(--ease)}
+.progress .pball{position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:22px;height:22px;pointer-events:none}
+.progress .pball svg{width:100%;height:100%;filter:drop-shadow(0 2px 5px rgba(0,0,0,.28))}
+.q-axes{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.22em;color:#2f6b3f;font-weight:800;margin-bottom:12px}
+.q-axes .qa-ball{width:15px;height:15px;flex:none;filter:drop-shadow(0 0 6px rgba(255,77,109,.5))}
+.q-card{position:relative;padding:6px 4px 14px;margin-bottom:14px}
+.q-num{position:absolute;top:20px;right:20px;font-size:13px;color:#8a6d3b;font-weight:800;letter-spacing:.04em}
+.q-title{font-size:21px;line-height:1.42;font-weight:800;letter-spacing:.005em;padding-right:56px;margin-bottom:6px;color:#5a3a1a}
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt{
+  display:flex;align-items:center;gap:14px;text-align:left;width:100%;border-radius:14px;
+  border:2px dashed rgba(168,104,58,.45);background:rgba(255,252,242,.92);padding:15px 16px;font-size:15.5px;font-weight:700;color:#5a3a1a;
+  transition:transform .15s var(--ease),border-color .15s,background .15s;min-height:58px;box-shadow:0 4px 12px rgba(90,60,25,.10);
+}
+.opt .idx{flex:none;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#7a5230;background:#f3e2bd;transition:all .15s}
+.opt:hover{border-color:rgba(168,104,58,.8);background:#fff8e8;transform:translateY(-1px)}
+.opt:active{transform:scale(.985)}
+.opt.sel{border-color:#e8574f;background:#fff0e6}
+.opt.sel .idx{background:linear-gradient(135deg,#ff7a6e,#e8574f);color:#fff}
+.opt .ck{margin-left:auto;flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;opacity:0;transform:scale(.5);transition:all .2s var(--ease)}
+.opt.sel .ck{opacity:1;transform:scale(1)}
+.opt .ck svg{width:13px;height:13px;stroke:#fff}
+
+/* ============ result ============ */
+#viewResult{padding-top:18px}
+.result-head{text-align:center;margin-bottom:16px}
+.result-head .k{font-size:12px;letter-spacing:.28em;color:var(--ink3);font-weight:600}
+.result-head h2{font-size:26px;font-weight:900;margin-top:8px}
+/* 结算：米色纸张衬底 + 自然场景卡（图片2风格） */
+.paper{
+  position:relative;border-radius:22px;overflow:visible;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255,255,255,.55), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(214,188,142,.38), transparent 46%),
+    #F4ECDD;
+  padding:24px 18px 18px;
+  box-shadow:0 30px 60px rgba(60,45,20,.28), inset 0 0 0 1px rgba(120,95,55,.16);
+}
+.paper::before{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;
+  background-image:radial-gradient(rgba(120,95,55,.15) 1px, transparent 1px);background-size:14px 14px;opacity:.5}
+.tape{position:absolute;z-index:3;width:94px;height:26px;background:rgba(176,130,66,.92);
+  border-left:1px dashed rgba(120,95,55,.3);border-right:1px dashed rgba(120,95,55,.3);
+  box-shadow:0 2px 5px rgba(0,0,0,.16)}
+.tape.tl{top:-12px;left:16%;transform:rotate(-6deg)}
+.tape.tr{top:-12px;right:16%;transform:rotate(5deg)}
+.ribbon{position:absolute;z-index:3;top:30px;right:-9px;width:26px;height:150px;
+  background:linear-gradient(180deg,#F9A8C8,#F472A0 45%,#E65E93);border-radius:8px;
+  transform:rotate(9deg);box-shadow:0 4px 10px rgba(180,60,90,.25)}
+.ribbon::after{content:"";position:absolute;left:-5px;right:-5px;bottom:-12px;height:20px;background:#F472A0;clip-path:polygon(0 0,100% 0,50% 100%)}
+.scene-card{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 16px 34px rgba(40,30,10,.24)}
+.scene-card .scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sc-label{text-align:center;font-size:13px;color:#7A88A8;margin:0 0 2px;letter-spacing:.06em;font-weight:600}
+.sc-name{text-align:center;font-size:38px;font-weight:900;letter-spacing:.01em;line-height:1.08;color:#22304B}
+.sc-type-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.sc-code{display:inline-flex;align-items:center;border-radius:999px;padding:6px 14px;
+  background:#EEF3FB;border:1px solid rgba(30,111,184,.18);font-size:14px;font-weight:800;letter-spacing:.16em;color:#1E6FB8}
+.sc-role{font-size:16px;font-weight:800;background:var(--grad-cool);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.02em}
+.sc-orb{position:relative;z-index:2;width:218px;height:218px;margin:16px auto 2px}
+.sc-orb .ground{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:86%;height:18px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(30,60,30,.42),transparent 70%);filter:blur(2px)}
+.sc-orb img{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 16px 26px rgba(20,40,20,.40));animation:float 5s ease-in-out infinite}
+.petal{position:absolute;z-index:2;width:10px;height:10px;border-radius:50% 0 50% 50%;background:linear-gradient(135deg,#FFD3E0,#F9A8C8);opacity:.85;transform:rotate(45deg);animation:petalFall 7s ease-in-out infinite}
+.petal.p1{top:12%;left:18%}
+.petal.p2{top:20%;right:22%;width:8px;height:8px;animation-delay:2.2s}
+.petal.p3{top:34%;left:28%;width:9px;height:9px;opacity:.7;animation-delay:4.1s}
+@keyframes petalFall{0%,100%{transform:translateY(0) rotate(45deg);opacity:.85}50%{transform:translateY(16px) rotate(68deg);opacity:.55}}
+.scene-info{position:relative;z-index:2;background:rgba(255,255,255,.94);padding:16px 16px 12px;border-top:1px solid rgba(120,95,55,.14)}
+.sc-div{height:1px;background:rgba(40,60,90,.10);margin:18px 2px 14px}
+.sc-sub{font-size:12px;letter-spacing:.2em;color:#5A6B8C;font-weight:800;margin-bottom:12px;text-align:center}
+.radar-wrap{display:flex;justify-content:center;margin:2px auto 4px}
+.radar-wrap svg{width:242px;height:242px;display:block}
+.radar-wrap .rl{fill:#7A88A8;font-size:12px;font-weight:800;text-anchor:middle}
+.radar-wrap .rv{fill:#22304B;font-size:10px;font-weight:700;text-anchor:middle}
+.radar-wrap .rr{fill:none;stroke:rgba(40,60,90,.12);stroke-width:1}
+.radar-wrap .rd{fill:none;stroke:rgba(40,60,90,.10);stroke-width:1}
+.radar-wrap .rgrid{fill:none;stroke:rgba(40,60,90,.16);stroke-width:1.4}
+.radar-wrap .rpoly{fill:url(#rgrad);fill-opacity:.5;stroke:var(--red);stroke-width:2.4;stroke-linejoin:round}
+.radar-wrap .rdot{fill:var(--amber)}
+.radar-wrap .rsum{fill:#5A6B8C;font-size:9px;font-weight:600;text-anchor:middle}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
+.chip{font-size:12.5px;font-weight:700;color:#33405E;border:1px solid rgba(40,60,90,.14);border-radius:999px;padding:7px 13px;background:#F2F6FC}
+.oak-block{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:center;margin-top:4px}
+.oak-portrait{position:relative;width:118px;height:150px;margin:0 auto;border-radius:20px;overflow:hidden;background:linear-gradient(160deg,#12304F,#0C2038);border:1px solid rgba(40,60,90,.2);flex:none;animation:oakBob 3.4s ease-in-out infinite,oakGlow 3.4s ease-in-out infinite}
+.oak-portrait::after{content:"";position:absolute;inset:auto 0 0 0;height:34%;background:linear-gradient(transparent,rgba(255,200,61,.18));pointer-events:none}
+.oak-portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4));animation:oakBreath 3.4s ease-in-out infinite;transform-origin:center bottom}
+@keyframes oakBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes oakBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@keyframes oakGlow{0%,100%{box-shadow:0 8px 22px rgba(0,0,0,.35),0 0 0 rgba(255,200,61,0)}50%{box-shadow:0 14px 28px rgba(0,0,0,.42),0 0 24px rgba(255,200,61,.42)}}
+.oak-text{min-width:0}
+.oak-name{font-size:13px;font-weight:800;color:#D98A2B;letter-spacing:.1em;margin-bottom:6px}
+.oak-intro{font-size:13.5px;line-height:1.65;color:#33405E;margin-bottom:8px}
+.oak-cheer{font-size:13.5px;line-height:1.65;color:#22304B;font-weight:700;padding-left:12px;border-left:3px solid var(--red);border-radius:2px}
+.sc-foot{text-align:center;font-size:11.5px;color:#8A97B5;margin-top:18px;letter-spacing:.04em;border-top:1px dashed rgba(40,60,90,.14);padding-top:14px}
+.actions{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:22px}
+.actions .row{display:flex;gap:12px;width:100%;max-width:340px}
+.actions .btn-ghost,.actions .btn-primary{max-width:none}
+
+/* ============ result · 手账卡片（蛋仔派对圆润可爱风） ============ */
+#viewResult{position:relative;padding:14px 16px 46px}
+.journal{
+  position:relative;border-radius:18px;padding:12px 12px 10px;overflow:hidden;
+  background:#fdf6e5;
+  border:10px solid #fdf6e5;outline:2px solid #e3cfa5;
+  transform:rotate(-.5deg);
+  box-shadow:0 14px 34px rgba(90,60,20,.32),0 4px 8px rgba(90,60,20,.18);
+}
+.journal::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(120,95,55,.12) 1px,transparent 1px);background-size:15px 15px;opacity:.4}
+.deco{position:absolute;z-index:22;pointer-events:none}
+.deco.tl{top:-20px;left:-14px;width:96px;height:40px;background:rgba(214,190,140,.9);transform:rotate(-35deg);
+  box-shadow:0 2px 6px rgba(120,95,55,.3);border-left:1px dashed rgba(120,95,55,.25);border-right:1px dashed rgba(120,95,55,.25)}
+.deco.tr{top:-16px;right:4px;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#FFD3A6,#FF9E3D);box-shadow:0 4px 8px rgba(180,110,40,.45)}
+.deco.tr::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.75)}
+.deco.br{bottom:-14px;left:30%;width:110px;height:30px;background:rgba(214,190,140,.9);transform:rotate(4deg);
+  box-shadow:0 2px 6px rgba(120,95,55,.3);border-left:1px dashed rgba(120,95,55,.25);border-right:1px dashed rgba(120,95,55,.25)}
+.j-kick{position:relative;text-align:center;font-size:12px;letter-spacing:.3em;color:#8A6D3B;font-weight:800;margin:2px 0 12px}
+.j-hero{position:relative;width:100%;display:flex;justify-content:center;align-items:flex-end;min-height:270px;margin-bottom:6px}
+.j-water{position:absolute;left:-8%;right:-8%;bottom:-6px;height:86px;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 40%, rgba(120,200,220,.5), rgba(120,200,220,0) 72%)}
+.j-water::after{content:"";position:absolute;left:8%;right:8%;bottom:8px;height:22px;border-radius:50%;
+  background:repeating-radial-gradient(ellipse at 50% 100%, transparent 0 10px, rgba(80,160,190,.26) 11px 13px)}
+.j-vtag-wrap{position:absolute;left:3px;top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;align-items:center}
+.j-ball{width:34px;height:34px;margin-bottom:-2px;filter:drop-shadow(0 3px 6px rgba(90,50,20,.25))}
+.j-vtag{
+  writing-mode:vertical-rl;letter-spacing:.12em;font-weight:900;font-size:18px;color:#5a3a1a;
+  background:#f3e6c8;border:2px solid #8a5a33;border-radius:6px 14px 6px 14px;padding:12px 7px;
+  box-shadow:0 6px 14px rgba(90,50,20,.18)}
+.j-drop{width:20px;height:20px;margin-top:4px;filter:drop-shadow(0 2px 4px rgba(43,108,163,.3))}
+.j-poke{position:relative;z-index:2;width:230px;height:230px;object-fit:contain;
+  filter:drop-shadow(0 20px 26px rgba(30,40,20,.30));animation:float 4.6s ease-in-out infinite}
+.j-pill{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;margin:-14px auto 16px;z-index:5;
+  width:max-content;max-width:90%;background:#fdf3dd;border:2px dashed #a8683a;border-radius:999px;padding:8px 18px;
+  box-shadow:0 6px 14px rgba(90,50,20,.14)}
+.j-pill svg{width:20px;height:20px;flex:none}
+.j-pill span{color:#8a4a1a;font-weight:800;font-size:16px;letter-spacing:.02em}
+.j-bars{position:relative;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.jb{position:relative;background:rgba(253,246,229,.95);border:2px solid #e3cfa5;border-radius:16px;padding:9px 12px 22px;box-shadow:0 5px 14px rgba(90,60,20,.08)}
+.jb-row{display:flex;align-items:center;gap:9px}
+.jb-ic{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center}
+.jb-ic svg{width:22px;height:22px}
+.jb-name{font-size:14.5px;font-weight:800;color:#5a3a1a}
+.jb-right{margin-left:auto;display:flex;align-items:center;gap:5px}
+.jb-stars{display:flex;gap:1px}
+.jb-stars svg{width:17px;height:17px}
+.jb-pct{font-size:12px;font-weight:800;color:#9a7a4a}
+.jb-track{position:absolute;left:12px;right:12px;bottom:8px;height:9px;border-radius:999px;background:rgba(0,0,0,.12);overflow:hidden}
+.jb-fill{display:block;height:100%;border-radius:999px}
+.j-note{position:relative;background:#fff9e8;border:2px dashed #d8b06a;border-radius:16px;padding:14px 16px 42px;
+  transform:rotate(-.5deg);box-shadow:0 8px 18px rgba(70,50,20,.10)}
+.j-note-foot{position:absolute;left:16px;right:16px;bottom:10px;display:flex;align-items:center;gap:6px;font-size:12px;color:#9a7a4a}
+.j-note-foot svg{width:16px;height:16px;flex:none}
+.j-note-foot b{color:#c0554a;font-weight:800}
+.j-note-foot .guardian{margin-left:auto;font-weight:800;color:#c0554a;white-space:nowrap}
+.j-pin{position:absolute;left:50%;top:-11px;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#FFD3A6,#FF9E3D);box-shadow:0 3px 6px rgba(180,110,40,.4);z-index:2}
+.j-note-t{font-size:13px;font-weight:900;color:#C98A2B;letter-spacing:.08em;margin-bottom:8px;text-align:center}
+.j-note p{font-size:14px;line-height:1.7;color:#5A4A2A;margin:0 0 6px}
+.j-note .j-cheer{font-weight:800;color:#33405E}
+.j-foot{position:relative;text-align:center;font-size:11.5px;color:#9A8A6A;margin-top:16px;letter-spacing:.05em;font-weight:600}
+.mini-again{position:fixed;right:18px;bottom:22px;z-index:40;border:none;cursor:pointer;opacity:.88;
+  display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,#FF7A6E,#FF4D6D);color:#fff;
+  font-size:13px;font-weight:800;padding:10px 16px;border-radius:999px;box-shadow:0 8px 20px rgba(255,77,109,.4)}
+.mini-again:active{transform:scale(.96)}
+
+/* ============ desktop ============ */
+@media (min-width:768px){
+  #app{max-width:560px}
+  h1{font-size:46px}
+  .q-title{font-size:23px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .bg,.pokeball,.sc-orb img,.sc-orb::after{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <span class="deco d1"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M4 50 a46 46 0 0 1 92 0 Z" fill="#FF4D6D"/><path d="M4 50 a46 46 0 0 0 92 0 Z" fill="#fff"/><rect x="4" y="47" width="92" height="6" fill="#0B1830"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#0B1830" stroke-width="7"/></svg></span>
+  <span class="deco d2"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C7.5 4 5 8.5 5 13c0 4.4 3.1 9 7 9s7-4.6 7-9c0-4.5-2.5-9-7-11z" fill="#4CD97B"/><path d="M12 22V9" stroke="#0B1830" stroke-width="1.4" fill="none"/></svg></span>
+  <span class="deco d3"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M4 50 a46 46 0 0 1 92 0 Z" fill="#38C7FF"/><path d="M4 50 a46 46 0 0 0 92 0 Z" fill="#fff"/><rect x="4" y="47" width="92" height="6" fill="#0B1830"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#0B1830" stroke-width="7"/></svg></span>
+  <span class="deco d4"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C7.5 4 5 8.5 5 13c0 4.4 3.1 9 7 9s7-4.6 7-9c0-4.5-2.5-9-7-11z" fill="#FFC83D"/><path d="M12 22V9" stroke="#0B1830" stroke-width="1.4" fill="none"/></svg></span>
+</div>
+
+<main id="app">
+
+  <!-- ===== 视图：开屏穿越 ===== -->
+  <section class="view active" id="viewIntro">
+    <div class="brand-tag"><span class="pill"><span class="dot"></span>SBTI · 精灵人格鉴定</span></div>
+    <img class="cover-title" src="assets/title_layer.png" alt="你穿越进了宝可梦世界，命定的初始宝可梦是？">
+    <div class="cover-roster" aria-hidden="true">
+      <img src="assets/cover/squirtle.png" alt="">
+      <img src="assets/cover/charmander.png" alt="">
+      <img src="assets/cover/pikachu.png" alt="">
+      <img src="assets/cover/eevee.png" alt="">
+      <img src="assets/cover/mew.png" alt="">
+      <img src="assets/cover/lucario.png" alt="">
+    </div>
+    <p class="tagline">回答 15 道穿越难题，唤醒与你灵魂同频的那只宝可梦。</p>
+    <div class="meta"><b>15</b><span>道题</span><span class="sep"></span><b>≈90</b><span>秒</span><span class="sep"></span><span>结果可截图分享</span></div>
+    <button class="btn-primary" id="btnStart">开始穿越</button>
+    <p class="note">凭第一直觉作答，别想太久 —— 精灵会看穿你的小心思</p>
+  </section>
+
+  <!-- ===== 视图：答题 ===== -->
+  <section class="view" id="viewQuiz">
+    <div class="quiz-top">
+      <button class="back" id="btnBack" aria-label="上一题">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="count" id="qCount">01 / 15</span>
+      <div class="progress"><i id="qBar"></i><span class="pball" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M4 50 a46 46 0 0 1 92 0 Z" fill="#FF4D6D"/><path d="M4 50 a46 46 0 0 0 92 0 Z" fill="#fff"/><rect x="4" y="47" width="92" height="6" fill="#0B1830"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#0B1830" stroke-width="7"/></svg></span></div>
+    </div>
+    <div id="qWrap"></div>
+  </section>
+
+  <!-- ===== 视图：结果 ===== -->
+  <section class="view" id="viewResult">
+    <div class="journal" id="shareCard">
+      <span class="deco tl" aria-hidden="true"></span>
+      <span class="deco tr" aria-hidden="true"></span>
+      <span class="deco br" aria-hidden="true"></span>
+      <div class="j-kick">RESULT · 结果揭晓</div>
+      <div class="j-hero">
+        <span class="j-water" aria-hidden="true"></span>
+        <div class="j-vtag-wrap">
+          <svg class="j-ball" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 1 10 10H2A10 10 0 0 1 12 2z" fill="#e8574f"/><path d="M2 12h20" stroke="#7a3a2a" stroke-width="1.6"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#7a3a2a" stroke-width="1.6"/></svg>
+          <span class="j-vtag" id="rsVTag"></span>
+          <svg class="j-drop" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.5 4.5 6 7.8 6 11a6 6 0 0 1-12 0c0-3.2 2.5-6.5 6-11z" fill="#4aa3df" stroke="#2b6ca3" stroke-width="1.5"/></svg>
+        </div>
+        <img class="j-poke" id="rsImg" alt="">
+      </div>
+      <div class="j-pill">
+        <svg viewBox="0 0 24 24" fill="#e8574f" aria-hidden="true"><path d="M12 21s-7.5-4.7-10-9.3C.6 8.9 2.4 5 6 5c2.2 0 3.6 1.2 4.4 2.4h3.2C14.4 6.2 15.8 5 18 5c3.6 0 5.4 3.9 4 6.7C19.5 16.3 12 21 12 21z" transform="scale(.9) translate(1.3,1.3)"/></svg>
+        <span id="rsRole"></span>
+        <svg viewBox="0 0 24 24" fill="#e8574f" aria-hidden="true"><path d="M12 21s-7.5-4.7-10-9.3C.6 8.9 2.4 5 6 5c2.2 0 3.6 1.2 4.4 2.4h3.2C14.4 6.2 15.8 5 18 5c3.6 0 5.4 3.9 4 6.7C19.5 16.3 12 21 12 21z" transform="scale(.9) translate(1.3,1.3)"/></svg>
+      </div>
+      <div class="j-bars" id="rsBars"></div>
+      <div class="j-note">
+        <span class="j-pin" aria-hidden="true"></span>
+        <div class="j-note-t">大木博士的图鉴笔记</div>
+        <p id="rsOak"></p>
+        <p class="j-cheer" id="rsCheer"></p>
+        <div class="j-note-foot">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#c0554a"/><path d="M2 12h20" stroke="#fff" stroke-width="2.5"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg>
+          <span>训练家：<b>@你的名字</b></span>
+          <span class="guardian">生成我的专属守护者</span>
+        </div>
+      </div>
+      <div class="j-foot">长按本卡 · 分享到 朋友圈 / 小红书 / 抖音</div>
+    </div>
+
+    <button class="mini-again" id="btnAgain" type="button">↻ 再测一次</button>
+
+    <div class="actions">
+      <button class="btn-primary" id="btnSave">保存结果</button>
+      <div class="row" style="display:none">
+        <button class="btn-ghost" id="btnCopy">复制文案</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 32 张立绘静态预加载（结果图从本容器取值，避免运行时拼路径裂图） -->
+<div id="pokeCache" hidden aria-hidden="true">
+  <img src="assets/pokemon/istj-c.png" alt="" data-code="ISTJ-C">
+  <img src="assets/pokemon/istj-s.png" alt="" data-code="ISTJ-S">
+  <img src="assets/pokemon/isfj-c.png" alt="" data-code="ISFJ-C">
+  <img src="assets/pokemon/isfj-s.png" alt="" data-code="ISFJ-S">
+  <img src="assets/pokemon/infj-c.png" alt="" data-code="INFJ-C">
+  <img src="assets/pokemon/infj-s.png" alt="" data-code="INFJ-S">
+  <img src="assets/pokemon/intj-c.png" alt="" data-code="INTJ-C">
+  <img src="assets/pokemon/intj-s.png" alt="" data-code="INTJ-S">
+  <img src="assets/pokemon/istp-c.png" alt="" data-code="ISTP-C">
+  <img src="assets/pokemon/istp-s.png" alt="" data-code="ISTP-S">
+  <img src="assets/pokemon/isfp-c.png" alt="" data-code="ISFP-C">
+  <img src="assets/pokemon/isfp-s.png" alt="" data-code="ISFP-S">
+  <img src="assets/pokemon/infp-c.png" alt="" data-code="INFP-C">
+  <img src="assets/pokemon/infp-s.png" alt="" data-code="INFP-S">
+  <img src="assets/pokemon/intp-c.png" alt="" data-code="INTP-C">
+  <img src="assets/pokemon/intp-s.png" alt="" data-code="INTP-S">
+  <img src="assets/pokemon/estp-c.png" alt="" data-code="ESTP-C">
+  <img src="assets/pokemon/estp-s.png" alt="" data-code="ESTP-S">
+  <img src="assets/pokemon/esfp-c.png" alt="" data-code="ESFP-C">
+  <img src="assets/pokemon/esfp-s.png" alt="" data-code="ESFP-S">
+  <img src="assets/pokemon/enfp-c.png" alt="" data-code="ENFP-C">
+  <img src="assets/pokemon/enfp-s.png" alt="" data-code="ENFP-S">
+  <img src="assets/pokemon/entp-c.png" alt="" data-code="ENTP-C">
+  <img src="assets/pokemon/entp-s.png" alt="" data-code="ENTP-S">
+  <img src="assets/pokemon/estj-c.png" alt="" data-code="ESTJ-C">
+  <img src="assets/pokemon/estj-s.png" alt="" data-code="ESTJ-S">
+  <img src="assets/pokemon/esfj-c.png" alt="" data-code="ESFJ-C">
+  <img src="assets/pokemon/esfj-s.png" alt="" data-code="ESFJ-S">
+  <img src="assets/pokemon/enfj-c.png" alt="" data-code="ENFJ-C">
+  <img src="assets/pokemon/enfj-s.png" alt="" data-code="ENFJ-S">
+  <img src="assets/pokemon/entj-c.png" alt="" data-code="ENTJ-C">
+  <img src="assets/pokemon/entj-s.png" alt="" data-code="ENTJ-S">
+</div>
+
+<div id="toast" role="status"></div>
+<canvas id="shareCanvas" width="1080" height="2000" style="display:none"></canvas>
+
+<script>
+'use strict';
+/* ================= 题库池：5 维各 6 题场景化，每次抽 3 + 洗牌 ================= */
+let QUESTIONS = [];
+function shuffle(arr){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function buildQuestions(){
+  const picked = [];
+  Object.keys(QUESTION_POOL).forEach(axis=>{
+    shuffle(QUESTION_POOL[axis]).slice(0,3).forEach(q=>{
+      picked.push({axis, q:q.q, opts:shuffle(q.opts)});
+    });
+  });
+  QUESTIONS = shuffle(picked);
+  answers = [];
+}
+const QUESTION_POOL = {
+  EI:[
+    {q:'你被传送到了一个人声鼎沸的宝可梦集市，摊位林立、热闹非凡。你的第一反应是——', opts:[
+      {t:'挨个摊位搭话，跟摊主聊个不停', p:'E'},
+      {t:'先绕一圈，看清楚再决定跟谁说话', p:'I'},
+      {t:'马上凑进旁边一群人的讨论里', p:'E'},
+      {t:'找个安静角落先待着，缓缓神', p:'I'}]},
+    {q:'博士的助手带你参观研究所，迎面走来一群研究员。你会——', opts:[
+      {t:'主动自我介绍，把名字先报上', p:'E'},
+      {t:'微笑点头，等别人先开口', p:'I'},
+      {t:'拉上助手一起加入他们的聊天', p:'E'},
+      {t:'安静跟在后面听他们讲', p:'I'}]},
+    {q:'森林里遇到一支正扎营的探险队，篝火已经点起来了。你——', opts:[
+      {t:'走上去帮忙搭把手，很快就混熟了', p:'E'},
+      {t:'先在远处观察一会儿，再慢慢靠近', p:'I'},
+      {t:'主动问他们从哪来、要去哪', p:'E'},
+      {t:'点头示意后，自己找地方坐下', p:'I'}]},
+    {q:'你的宝可梦在道馆赛输了，队友围过来七嘴八舌安慰你。你——', opts:[
+      {t:'越说越来劲，跟大家把这场复盘聊开', p:'E'},
+      {t:'想一个人待会儿，静静消化', p:'I'},
+      {t:'把情绪讲给每一个人听', p:'E'},
+      {t:'道声谢就自己回房间待着', p:'I'}]},
+    {q:'出发前，博士问你要不要和其他训练家结伴上路。你——', opts:[
+      {t:'当然要，路上有人一起才有趣', p:'E'},
+      {t:'还是算了，一个人走得自在', p:'I'},
+      {t:'立刻约好明天的集合时间', p:'E'},
+      {t:'说看情况，其实更想独自走', p:'I'}]},
+    {q:'镇上办宝可梦嘉年华，音乐、气球、人群挤满广场。你——', opts:[
+      {t:'一头扎进去玩到天黑', p:'E'},
+      {t:'远远看着也挺好，不挤进去', p:'I'},
+      {t:'拉着同伴一起疯玩', p:'E'},
+      {t:'坐在外围喝着饮料看热闹', p:'I'}]}
+  ],
+  SN:[
+    {q:'博士递给你一张藏宝图，上面画着弯弯绕绕的路线。你先看的是——', opts:[
+      {t:'图上标得清清楚楚的地点和距离', p:'S'},
+      {t:'终点究竟藏着什么宝物和传说', p:'N'},
+      {t:'每一段路的方向和地标', p:'S'},
+      {t:'这条路通向哪个未知的传说', p:'N'}]},
+    {q:'路过一片发着光的奇怪草丛。你——', opts:[
+      {t:'直接走进去，看看里面到底有什么', p:'S'},
+      {t:'忍不住想这背后是什么神秘力量', p:'N'},
+      {t:'留意草丛里真实的声音和动静', p:'S'},
+      {t:'想象它通向一个怎样的奇幻世界', p:'N'}]},
+    {q:'训练新宝可梦时，最让你兴奋的是——', opts:[
+      {t:'它真的把那个招式练成的那一刻', p:'S'},
+      {t:'想象它将来会进化成什么样', p:'N'},
+      {t:'看着它的等级和属性实打实上涨', p:'S'},
+      {t:'憧憬它和你并肩的种种可能', p:'N'}]},
+    {q:'在一座古塔里发现刻满图案的石壁。你——', opts:[
+      {t:'仔细辨认每一道刻痕和符号', p:'S'},
+      {t:'琢磨这些图案想讲一个什么故事', p:'N'},
+      {t:'把石壁上的细节都记下来', p:'S'},
+      {t:'联想这座塔背后的古老秘密', p:'N'}]},
+    {q:'这趟冒险里，最让你着迷的是——', opts:[
+      {t:'亲眼看到的风景、遇到的宝可梦', p:'S'},
+      {t:'永远猜不到的下一站会是什么', p:'N'},
+      {t:'实打实的打斗、收集和成长过程', p:'S'},
+      {t:'关于未来的那些想象和计划', p:'N'}]},
+    {q:'摊开一张世界地图，你的目光会先落在——', opts:[
+      {t:'标得清清楚楚的城镇和道路', p:'S'},
+      {t:'还是一片空白的未知区域', p:'N'},
+      {t:'已经去过、熟悉的地方', p:'S'},
+      {t:'地图上看不见的那些秘密', p:'N'}]}
+  ],
+  TF:[
+    {q:'两个伙伴为了走哪条路吵起来，都来找你评理。你——', opts:[
+      {t:'摆出两边利弊，按最合理的路线来', p:'T'},
+      {t:'先安抚两人情绪，别伤了和气', p:'F'},
+      {t:'用事实和数据说服他们', p:'T'},
+      {t:'更在意谁被冷落了、谁心里难受', p:'F'}]},
+    {q:'你的宝可梦为了救你受了重伤。你——', opts:[
+      {t:'立刻想办法找药、定治疗方案', p:'T'},
+      {t:'心疼得不行，先抱着安慰它', p:'F'},
+      {t:'冷静评估伤情和接下来怎么办', p:'T'},
+      {t:'满心愧疚，觉得都怪自己', p:'F'}]},
+    {q:'对手在比赛中使了小动作，裁判没看到。你——', opts:[
+      {t:'明确指出规则，据理力争', p:'T'},
+      {t:'心里替对手担心他会内疚', p:'F'},
+      {t:'只看结果，要赢就赢得干净', p:'T'},
+      {t:'忍不住想他是不是有苦衷', p:'F'}]},
+    {q:'要选一个一起旅行的同伴，你最看重——', opts:[
+      {t:'他可靠、实力强、思路清楚', p:'T'},
+      {t:'和他待在一起舒不舒服', p:'F'},
+      {t:'逻辑上合不合拍、效率高不高', p:'T'},
+      {t:'感情上是不是真心相待', p:'F'}]},
+    {q:'做重要决定时，你最后的依据是——', opts:[
+      {t:'把利弊算清楚，选最优解', p:'T'},
+      {t:'心里那份真实的感受', p:'F'},
+      {t:'事实和逻辑，少扯感觉', p:'T'},
+      {t:'直觉和在乎之人的想法', p:'F'}]},
+    {q:'伙伴突然说想放弃冒险回家。你——', opts:[
+      {t:'帮他分析继续和放弃的利弊', p:'T'},
+      {t:'问他是不是遇到什么伤心事了', p:'F'},
+      {t:'直接讲清楚坚持下去的道理', p:'T'},
+      {t:'先陪着他，等情绪过去再说', p:'F'}]}
+  ],
+  JP:[
+    {q:'出发前收拾行李，你的习惯是——', opts:[
+      {t:'列清单，每样东西固定放好', p:'J'},
+      {t:'随手塞，缺了路上再补', p:'P'},
+      {t:'提前按天规划好整个行程', p:'J'},
+      {t:'走到哪算哪，随机应变', p:'P'}]},
+    {q:'博士告诉你一周后要出发去远方。你——', opts:[
+      {t:'当天就开始做详细计划', p:'J'},
+      {t:'到时候再说，现在想那么多干嘛', p:'P'},
+      {t:'把要准备的东西先列出来', p:'J'},
+      {t:'保持灵活，随时准备改主意', p:'P'}]},
+    {q:'面对一场没有时间限制的大冒险——', opts:[
+      {t:'喜欢有明确路线和阶段目标', p:'J'},
+      {t:'喜欢边走边发现，惊喜不断', p:'P'},
+      {t:'先把大致框架定下来再走', p:'J'},
+      {t:'享受过程，结果随缘', p:'P'}]},
+    {q:'翻开你的冒险笔记，里面通常是——', opts:[
+      {t:'分门别类，记得清清楚楚', p:'J'},
+      {t:'想到什么写什么，很随意', p:'P'},
+      {t:'有自己固定的整理方法', p:'J'},
+      {t:'随手乱记，从不整理', p:'P'}]},
+    {q:'快到出发时间，同伴还在慢吞吞地磨蹭。你——', opts:[
+      {t:'催他，按说好的时间走', p:'J'},
+      {t:'反正不赶时间，等等也没事', p:'P'},
+      {t:'觉得不守时让人很恼火', p:'J'},
+      {t:'觉得晚一点也没什么大不了', p:'P'}]},
+    {q:'一周的行程摆在面前，你会——', opts:[
+      {t:'提前排好每天去哪、住哪', p:'J'},
+      {t:'留白，到时候看心情决定', p:'P'},
+      {t:'习惯把备选方案都准备好', p:'J'},
+      {t:'享受临时起意的惊喜', p:'P'}]}
+  ],
+  CS:[
+    {q:'连续输掉三场对战，心态开始紧绷时，你——', opts:[
+      {t:'稳住节奏，复盘调整，照常发挥', p:'C'},
+      {t:'越输越急，动作和心态都开始变形', p:'S'},
+      {t:'告诉自己这很正常，慢慢来', p:'C'},
+      {t:'突然烦躁起来，什么都不想干', p:'S'}]},
+    {q:'压力很大的时候，你更像——', opts:[
+      {t:'压力越大反而越稳，内核不变', p:'C'},
+      {t:'平时那套会崩掉，露出另一个自己', p:'S'},
+      {t:'表面照常，心里清楚自己还是老样子', p:'C'},
+      {t:'变得连自己都认不出来', p:'S'}]},
+    {q:'队友拖后腿、局面越来越乱时，你——', opts:[
+      {t:'稳住自己那部分，该干嘛干嘛', p:'C'},
+      {t:'忍不住发火，或者干脆摆烂', p:'S'},
+      {t:'情绪稳定，责任照担', p:'C'},
+      {t:'心里炸了，行为和平时判若两人', p:'S'}]},
+    {q:'突然要面对一场决定命运的考验——', opts:[
+      {t:'冷静下来，按步骤一步步应对', p:'C'},
+      {t:'慌得手忙脚乱，发挥失常', p:'S'},
+      {t:'越是大事越沉得住气', p:'C'},
+      {t:'紧张得发挥出另一个自己', p:'S'}]},
+    {q:'被所有人误会，解释也没人听时，你——', opts:[
+      {t:'先冷静，找机会用事实说话', p:'C'},
+      {t:'又委屈又愤怒，情绪直接失控', p:'S'},
+      {t:'相信清者自清，稳住心态', p:'C'},
+      {t:'越想越气，开始怼人摆烂', p:'S'}]},
+    {q:'挑战突然变得比想象中难得多——', opts:[
+      {t:'调整策略，咬牙继续', p:'C'},
+      {t:'心态崩了，开始自我怀疑', p:'S'},
+      {t:'越是困难越能顶住', p:'C'},
+      {t:'平时的不安全冒出来，判若两人', p:'S'}]}
+  ]
+};
+
+/* ================= 32 型结果映射（来自《性格对应宝可梦》） ================= */
+const TYPES = {
+ 'ISTJ-C':{code:'ISTJ-C',role:'沉稳守序的实干者',poke:'卡蒂狗',why:'忠诚可靠的守护犬，恪尽职守、沉稳克制，情绪稳定'},
+ 'ISTJ-S':{code:'ISTJ-S',role:'固执内耗的秩序执行者',poke:'可达鸭',why:'一紧张就头痛卡壳、钻牛角尖，抗拒改变、默默内耗'},
+ 'ISFJ-C':{code:'ISFJ-C',role:'温柔贴心的守护者',poke:'拉普拉斯',why:'温和稳重，可靠驮载众人过海，守得住边界'},
+ 'ISFJ-S':{code:'ISFJ-S',role:'委屈堆积的奉献者',poke:'笨笨鱼',why:'不起眼、自惭形秽，默默承受、消极回避，直到蜕变'},
+ 'INFJ-C':{code:'INFJ-C',role:'内敛通透的引路人',poke:'阿勃梭鲁',why:'独居、先觉灾厄的预言者，洞察强、冷静自持'},
+ 'INFJ-S':{code:'INFJ-S',role:'封闭内心的共情观察者',poke:'多龙梅西亚',why:'被同族排挤的孤独小家伙，脆弱自闭、拒绝交流'},
+ 'INTJ-C':{code:'INTJ-C',role:'长远布局的战略家',poke:'铁哑铃',why:'无感情、目标唯一的冷峻单元，冷静抽离'},
+ 'INTJ-S':{code:'INTJ-S',role:'孤绝偏执的规划者',poke:'超梦',why:'对人类失望、高傲不信任，多疑孤立、偏执'},
+ 'ISTP-C':{code:'ISTP-C',role:'冷静灵巧的实操达人',poke:'熊徒弟',why:'专心练武、招数精准，临阵越练越稳的格斗者'},
+ 'ISTP-S':{code:'ISTP-S',role:'摆烂逃避的探索者',poke:'鲤鱼王',why:'只会“水溅跃”，遇事摆烂闪避、不受管束'},
+ 'ISFP-C':{code:'ISFP-C',role:'忠于自我的艺术家',poke:'藤藤蛇',why:'优雅傲娇、有审美、忠于自我风格的“冷面艺术家”'},
+ 'ISFP-S':{code:'ISFP-S',role:'沉默对抗的创作者',poke:'新叶喵',why:'害羞敏感，受压就缩起身体，用沉默拒人'},
+ 'INFP-C':{code:'INFP-C',role:'赤诚浪漫的梦想家',poke:'波克比',why:'纯真乐观、相信美好，自带治愈光环、自愈力强'},
+ 'INFP-S':{code:'INFP-S',role:'自我否定的理想者',poke:'雪吞虫',why:'渺小脆弱，对世界恐惧悲观、自我怀疑'},
+ 'INTP-C':{code:'INTP-C',role:'好奇思辨的思考者',poke:'迷你龙',why:'沉静优雅、充满好奇，独处中慢慢求证探索'},
+ 'INTP-S':{code:'INTP-S',role:'纠结细节的思维发散者',poke:'伊布',why:'纠结“进化成哪个形态”，无限可能反而迟迟定不下来'},
+ 'ESTP-C':{code:'ESTP-C',role:'鲜活果敢的冒险家',poke:'圆陆鲨',why:'莽撞无畏、说干就干，临阵勇猛、敢行动'},
+ 'ESTP-S':{code:'ESTP-S',role:'靠刺激掩盖不安的行动派',poke:'皮丘',why:'一兴奋就放电失控，用闹腾、冲动掩盖内心'},
+ 'ESFP-C':{code:'ESFP-C',role:'热烈鲜活的乐天派',poke:'呆火鳄',why:'乐观爱唱歌、憨憨搞笑，擅长带动氛围'},
+ 'ESFP-S':{code:'ESFP-S',role:'回避深层的表演者',poke:'果然翁',why:'整天蹦跶逗乐，用玩闹回避正面冲突（只会反击招）'},
+ 'ENFP-C':{code:'ENFP-C',role:'元气迸发的灵感家',poke:'利欧路',why:'热血上进、充满理想与期待，元气满满往前冲'},
+ 'ENFP-S':{code:'ENFP-S',role:'热情骤降的追梦人',poke:'炭小侍',why:'一心“想进化变强”的追梦少年，受挫就怀疑意义、热情冷却'},
+ 'ENTP-C':{code:'ENTP-C',role:'机敏善辩的创新者',poke:'鬼斯',why:'爱恶作剧、机灵诡变，乐于戏弄试探的捣蛋鬼'},
+ 'ENTP-S':{code:'ENTP-S',role:'抬杠掩盖不安的辩论者',poke:'烛光灵',why:'用诡异诱惑、捉弄作祟掩饰内在的不安'},
+ 'ESTJ-C':{code:'ESTJ-C',role:'干练果决的管理者',poke:'妙蛙种子',why:'队伍里成熟的大哥，公允调停、沉稳担当'},
+ 'ESTJ-S':{code:'ESTJ-S',role:'强势独断的组织者',poke:'波加曼',why:'争强好胜、爱当老大气使唤，受挫就硬撑掌控'},
+ 'ESFJ-C':{code:'ESFJ-C',role:'热忱温暖的协调者',poke:'水跃鱼',why:'热忱友善、忠诚照顾伙伴，维护队伍和气'},
+ 'ESFJ-S':{code:'ESFJ-S',role:'讨好过度的联结者',poke:'拉鲁拉丝',why:'极度敏感、察言观色，怕被讨厌而迎合退缩'},
+ 'ENFJ-C':{code:'ENFJ-C',role:'富有感染力的引导者',poke:'土王',why:'松弛治愈、情绪稳定的暖男，用平静安抚人心'},
+ 'ENFJ-S':{code:'ENFJ-S',role:'强行改造他人的鼓舞者',poke:'幼基拉斯',why:'曾被排斥受伤，对善意警惕，失望时疏离对抗'},
+ 'ENTJ-C':{code:'ENTJ-C',role:'锋芒笃定的领导者',poke:'烈空坐',why:'冷静自信的天际霸主，逆境果断出面掌控局面'},
+ 'ENTJ-S':{code:'ENTJ-S',role:'急躁强势的统帅型',poke:'火斑喵',why:'孤傲强势、执拗守护，对自己和认定目标都要求严苛'}
+};
+
+/* ================= 大木博士：对宝可梦的介绍 + 按性格定制的鼓励 ================= */
+const DR = {
+ 'ISTJ-C':{oak:'这只卡蒂狗沉稳又忠诚，认准了同伴就绝不离开——是我见过最可靠的搭档。', cheer:'沉着守序是你的底色，别怀疑，你就是那种让人安心托付的人。'},
+ 'ISTJ-S':{oak:'可达鸭呀，一紧张就头疼卡壳，可它心里其实比谁都认真。', cheer:'压力会把节奏打乱，但你的认真和坚持一直都在，慢一点也走得稳。'},
+ 'ISFJ-C':{oak:'拉普拉斯性情温和、驮载稳妥，多少训练家都是靠着它渡过的海。', cheer:'温柔是你最坚实的铠甲，被你守护过的人都会记得那份安心。'},
+ 'ISFJ-S':{oak:'别瞧笨笨鱼不起眼，它心里藏着跃龙门的决心，只是时候未到。', cheer:'别小看那个总在退让的自己，你的耐心终会换来属于自己的跃龙门。'},
+ 'INFJ-C':{oak:'阿勃梭鲁总比旁人更早感知风暴，是一位冷静的预兆者。', cheer:'你的洞察深过多数人，相信那种预感，它会带你和重要的人避开弯路。'},
+ 'INFJ-S':{oak:'多龙梅西亚有点怕生，习惯躲开热闹，其实非常渴望被理解。', cheer:'害怕被推开不是你的错，试着让懂的人靠近一点，你会被温柔接住。'},
+ 'INTJ-C':{oak:'铁哑铃是个目标明确的冷峻小家伙，认定方向就一路走下去。', cheer:'目标清晰是你的天赋，记得沿途也停一停，别把唯一的自己耗成机器。'},
+ 'INTJ-S':{oak:'超梦天赋异禀却心怀戒备，它比谁都更渴望一份真正的信任。', cheer:'失望让你变得锋利，但真正的强者不是不再相信，而是仍愿意试一次。'},
+ 'ISTP-C':{oak:'熊徒弟天天练武、招数精准，是那种临阵反而越打越稳的选手。', cheer:'你的冷静和手劲儿，能解决大多数混乱——相信自己动手时的判断。'},
+ 'ISTP-S':{oak:'鲤鱼王看着只会水溅跃，可你永远猜不到它下一秒会怎么蹦。', cheer:'偶尔摆烂是给精神放个假，可别真的放弃，你的爆发力还没被看见。'},
+ 'ISFP-C':{oak:'藤藤蛇优雅又有主见，审美独到，从不轻易迎合别人。', cheer:'坚持做自己是少数人的勇敢，你的审美和坚持，终会有人懂。'},
+ 'ISFP-S':{oak:'新叶喵害羞敏感，一紧张就缩起身体，需要一点耐心去靠近。', cheer:'敏感不是弱点，是你感知世界的天赋；不必迎合，慢慢来就好。'},
+ 'INFP-C':{oak:'波克比浑身都是治愈力，相信美好、自带光环，让人看了就安心。', cheer:'你心里那份赤诚的相信，正是这个世界最稀缺的光，别让它熄灭。'},
+ 'INFP-S':{oak:'雪吞虫虽然渺小又胆小，但它一直在学着相信这个世界。', cheer:'你不是不够好，只是还没看见自己身上的光——它一直都在。'},
+ 'INTP-C':{oak:'迷你龙沉静优雅，好奇心强，喜欢一个人安安静静地求证探索。', cheer:'你的好奇是通往深处的钥匙，独处不是孤单，是你积蓄力量的方式。'},
+ 'INTP-S':{oak:'伊布有无数进化的可能，它只是还没想好要先成为哪一个。', cheer:'选择多不等于要现在全做对，先选一个开始，路会越走越清晰。'},
+ 'ESTP-C':{oak:'圆陆鲨莽撞无畏、说干就干，是行动力最强的冒险家。', cheer:'你的行动力就是最好的天赋，冲之前多看一眼地图，会少绕很多弯。'},
+ 'ESTP-S':{oak:'皮丘一兴奋就放电，闹腾的背后，藏着它不想让人看见的心事。', cheer:'热闹是保护色，但真正的你也很珍贵——偶尔安静下来，听听自己。'},
+ 'ESFP-C':{oak:'呆火鳄天生乐天，爱唱歌又搞笑，总能把气氛点得火热。', cheer:'你的笑容有传染力，照顾别人之余，也别忘了照顾那个爱笑的自己。'},
+ 'ESFP-S':{oak:'果然翁整天蹦跶逗乐，可它其实只想被人认真地看着。', cheer:'逗别人笑是你的温柔，可有些事也值得认真面对，你比你以为的更强。'},
+ 'ENFP-C':{oak:'利欧路热血上进，眼里有光，是那种带着整个队伍往前冲的元气派。', cheer:'你的热情能点亮很多人，记得把这份火也留一点给自己保温。'},
+ 'ENFP-S':{oak:'炭小侍一心想要进化变强，偶尔受挫会降温，但火种从未熄灭。', cheer:'跌倒不是梦想的终点，冷却过的热情重新点燃时，会烧得更旺。'},
+ 'ENTP-C':{oak:'鬼斯机灵又爱恶作剧，总想试探这个世界的边边角角。', cheer:'你的机敏是天赋，用聪明去创造而不是对抗，你会赢得更多掌声。'},
+ 'ENTP-S':{oak:'烛光灵总用捉弄和诱惑来掩饰心里那点不安，其实火很暖。', cheer:'不安让你张牙舞爪，但你的火也有温柔的一面，不必总用尖刺示人。'},
+ 'ESTJ-C':{oak:'妙蛙种子是队伍里成熟的大哥，公允调停、沉稳可靠。', cheer:'你天生是能把团队撑起来的人，累了也允许自己靠一靠别人。'},
+ 'ESTJ-S':{oak:'波加曼争强好胜、爱当老大，受挫了也硬撑着不肯低头。', cheer:'逞强不是强，真正的强大是敢于示弱——你值得被支持，不只是去支持。'},
+ 'ESFJ-C':{oak:'水跃鱼热忱友善，一心照顾伙伴，队伍的和气全靠它张罗。', cheer:'你的周到让人如沐春风，别忘了自己也值得被这样温柔对待。'},
+ 'ESFJ-S':{oak:'拉鲁拉丝极度敏感、善于察言观色，总是怕别人讨厌它。', cheer:'你那么会照顾别人的感受，也请把同样的体贴留一点给自己。'},
+ 'ENFJ-C':{oak:'土王松弛治愈、情绪稳定，往那一站就能让人安心下来。', cheer:'你的存在本身就是一种治愈，偶尔也让人来温暖你一下。'},
+ 'ENFJ-S':{oak:'幼基拉斯曾受过伤，对善意格外警惕，需要很多耐心才能走近。', cheer:'受过伤所以筑墙可以理解，但别让过去的冷，冻住现在愿意靠近你的暖。'},
+ 'ENTJ-C':{oak:'烈空坐是冷静自信的天际霸主，越到危难越能稳住全场。', cheer:'你天生是领航者，记得天空再高，也留一片给同行的人并肩。'},
+ 'ENTJ-S':{oak:'火斑喵孤傲强势又执拗，对认定的事，要求严格得近乎苛刻。', cheer:'严苛是对在乎之事的认真，但别把所有重量都压在自己肩上。'}
+};
+
+/* ================= 维度辅助 ================= */
+const AXIS_NAME = {EI:'能量来源', SN:'感知方式', TF:'决策方式', JP:'生活方式', CS:'承压模式'};
+const POLE_FULL = {
+  EI:{E:'外倾', I:'内倾'}, SN:{S:'实感', N:'直觉'}, TF:{T:'思考', F:'情感'},
+  JP:{J:'计划', P:'随性'}, CS:{C:'内核稳定', S:'承压变形'}
+};
+const CHIP = {
+  EI:{E:'人群充电', I:'独处回血'}, SN:{S:'细节雷达', N:'脑洞拉满'},
+  TF:{T:'理性优先', F:'共情在线'}, JP:{J:'计划控', P:'随性派'},
+  CS:{C:'内核稳定', S:'高压易变'}
+};
+const pad2 = n => String(n).padStart(2, '0');
+
+/* ================= 状态 ================= */
+let answers = Array(QUESTIONS.length).fill(null);
+let cur = 0;
+let busy = false;
+
+/* ================= DOM ================= */
+const $ = s => document.querySelector(s);
+const views = {intro:$('#viewIntro'), quiz:$('#viewQuiz'), result:$('#viewResult')};
+
+function showView(name){
+  Object.entries(views).forEach(([k,v])=>{ v.classList.toggle('active', k===name); });
+  window.scrollTo(0,0);
+}
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* ================= 答题渲染 ================= */
+function renderQuestion(i){
+  cur = i;
+  const it = QUESTIONS[i];
+  $('#qCount').textContent = `${pad2(i+1)} / ${pad2(QUESTIONS.length)}`;
+  $('#qBar').style.width = `${((i+1)/QUESTIONS.length)*100}%`;
+  const idx = ['A','B','C','D'];
+  const optsHtml = it.opts.map((o,k)=>
+    `<button class="opt${answers[i]===o.p?' sel':''}" data-p="${o.p}">
+       <span class="idx">${idx[k]}</span>
+       <span>${o.t}</span>
+       <span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>
+     </button>`).join('');
+  $('#qWrap').innerHTML =
+    `<div class="letter">
+       <span class="l-tape" aria-hidden="true"></span>
+       <div class="q-axes"><svg viewBox="0 0 100 100" class="qa-ball" aria-hidden="true"><path d="M4 50 a46 46 0 0 1 92 0 Z" fill="#FF4D6D"/><path d="M4 50 a46 46 0 0 0 92 0 Z" fill="#fff"/><rect x="4" y="47" width="92" height="6" fill="#0B1830"/><circle cx="50" cy="50" r="14" fill="#fff" stroke="#0B1830" stroke-width="7"/></svg>${AXIS_NAME[it.axis]} · ${it.axis}</div>
+       <div class="q-card">
+         <span class="q-num">Q${pad2(i+1)}</span>
+         <h3 class="q-title">${it.q}</h3>
+       </div>
+       <div class="opts">${optsHtml}</div>
+     </div>`;
+  $('#qWrap').querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(busy) return;
+      busy = true;
+      const pole = btn.dataset.p;
+      answers[i] = pole;
+      $('#qWrap').querySelectorAll('.opt').forEach(b=>b.classList.toggle('sel', b===btn));
+      setTimeout(()=>{
+        busy = false;
+        if(i < QUESTIONS.length-1){ renderQuestion(i+1); }
+        else { finish(); }
+      }, 330);
+    });
+  });
+}
+
+/* ================= 计分 ================= */
+function compute(){
+  const axes = ['EI','SN','TF','JP','CS'];
+  const votes = {EI:{E:0,I:0},SN:{S:0,N:0},TF:{T:0,F:0},JP:{J:0,P:0},CS:{C:0,S:0}};
+  answers.forEach((pole,i)=>{ votes[QUESTIONS[i].axis][pole]++; });
+  const detail = axes.map(a=>{
+    const [p1,p2] = a.split('');
+    const v1 = votes[a][p1], v2 = votes[a][p2];
+    return {a, p1, p2, v1, v2, win: v1>=v2?p1:p2};
+  });
+  const mbti = detail.slice(0,4).map(d=>d.win).join('');
+  const code = mbti + '-' + detail[4].win;
+  return {code, type: TYPES[code], detail};
+}
+
+/* ================= 雷达图（屏幕 SVG 与分享 Canvas 共用坐标） ================= */
+function radarData(detail){
+  // 返回每轴：值(0-100)、胜出字母
+  return detail.map(d=>{
+    const pct = Math.round(Math.max(d.v1,d.v2)/3*100);
+    return {v:pct, lab:d.win, axis:d.a};
+  });
+}
+function radarPoint(i, n, cx, cy, R, ratio){
+  const a = (-90 + i*(360/n)) * Math.PI/180;
+  return [cx + R*ratio*Math.cos(a), cy + R*ratio*Math.sin(a)];
+}
+function radarSVG(detail){
+  const n = detail.length;
+  const W = 250, H = 250, cx = 125, cy = 125, R = 80;
+  const data = radarData(detail);
+  const poly = arr => arr.map(p=>p.map(v=>Math.round(v)).join(',')).join(' ');
+  let s = '';
+  [25,50,75,100].forEach(r=>{
+    const ring = [];
+    for(let i=0;i<n;i++){ ring.push(radarPoint(i,n,cx,cy,R,r/100)); }
+    s += `<polygon class="rr" points="${poly(ring)}"/>`;
+  });
+  for(let i=0;i<n;i++){
+    const p = radarPoint(i,n,cx,cy,R,1);
+    s += `<line class="rd" x1="${cx}" y1="${cy}" x2="${Math.round(p[0])}" y2="${Math.round(p[1])}"/>`;
+  }
+  const dp = data.map((d,i)=>radarPoint(i,n,cx,cy,R,d.v/100));
+  s += `<polygon class="rpoly" points="${poly(dp)}"/>`;
+  data.forEach((d,i)=>{
+    const p = radarPoint(i,n,cx,cy,R,d.v/100);
+    s += `<circle class="rdot" cx="${Math.round(p[0])}" cy="${Math.round(p[1])}" r="3.4"/>`;
+  });
+  data.forEach((d,i)=>{
+    const p = radarPoint(i,n,cx,cy,R,(R+18)/R);
+    const pv = radarPoint(i,n,cx,cy,R,(R+36)/R);
+    s += `<text class="rl" x="${Math.round(p[0])}" y="${Math.round(p[1]+4)}">${d.lab}</text>`;
+    s += `<text class="rv" x="${Math.round(pv[0])}" y="${Math.round(pv[1]+3)}">${d.v}%</text>`;
+  });
+  const sum = Math.round(data.reduce((a,b)=>a+b.v,0)/n);
+  s += `<text class="rsum" x="${cx}" y="${cy+4}">综合 ${sum}%</text>`;
+  const defs = `<defs><linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4D6D"/><stop offset="1" stop-color="#FFC83D"/></linearGradient></defs>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="人格五维雷达图">${defs}${s}</svg>`;
+}
+
+/* ================= 结果渲染 ================= */
+function renderResult(){
+  const {code, type, detail} = compute();
+  const cimg = $('#pokeCache').querySelector('img[data-code="'+code+'"]');
+  $('#rsImg').src = cimg ? cimg.getAttribute('src') : '';
+  $('#rsImg').alt = type.poke;
+  $('#rsVTag').textContent = type.poke + '·' + code;
+  $('#rsRole').textContent = type.role;
+  const dr = DR[code] || {oak:type.why, cheer:'愿你的每一份坚持，都成为更好的自己。'};
+  $('#rsOak').textContent = dr.oak;
+  $('#rsCheer').textContent = dr.cheer;
+  // 五维偏向 → 5 行：图标 + 特质名 + 星星 + 百分比 + 进度条
+  const star = (ratio)=>{
+    const sp='M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z';
+    const base=`<path d="${sp}" fill="#e8ddc0" stroke="#d8c898" stroke-width="1"/>`;
+    const ov=ratio>0?`<path d="${sp}" fill="#f5b83d" stroke="#d8942a" stroke-width="1" clip-path="inset(0 ${Math.round((1-ratio)*100)}% 0 0)"/>`:'';
+    return `<svg viewBox="0 0 24 24">${base}${ov}</svg>`;
+  };
+  const meta = {
+    EI:{color:'#4aa3df', icon:'<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>'},
+    SN:{color:'#f5b83d', icon:'<circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/>'},
+    TF:{color:'#e8574f', icon:'<path d="M12 21s-7.5-4.7-10-9.3C.6 8.9 2.4 5 6 5c2.2 0 3.6 1.2 4.4 2.4h3.2C14.4 6.2 15.8 5 18 5c3.6 0 5.4 3.9 4 6.7C19.5 16.3 12 21 12 21z"/>'},
+    JP:{color:'#8a7ae8', icon:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'},
+    CS:{color:'#3dbd9e', icon:'<path d="M12 2l8 3v6c0 5.5-3.5 9.5-8 11-4.5-1.5-8-5.5-8-11V5l8-3z"/>'}
+  };
+  const bars = detail.map(d=>{
+    const total = d.v1+d.v2;
+    const pct = total ? Math.round((d.win===d.p1 ? d.v1 : d.v2) / total * 100) : 50;
+    const stars = Array.from({length:5},(_,i)=>star(Math.max(0,Math.min(1,pct/20-i)))).join('');
+    const m = meta[d.a] || {color:'#e8574f', icon:''};
+    return `<div class="jb">
+      <div class="jb-row">
+        <span class="jb-ic" style="background:${m.color}22"><svg viewBox="0 0 24 24" fill="none" stroke="${m.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${m.icon}</svg></span>
+        <span class="jb-name">${CHIP[d.a][d.win]}</span>
+        <span class="jb-right"><span class="jb-stars">${stars}</span><span class="jb-pct">(${pct}%)</span></span>
+      </div>
+      <div class="jb-track"><i class="jb-fill" style="width:${pct}%;background:linear-gradient(90deg,${m.color}99,${m.color})"></i></div>
+    </div>`;
+  }).join('');
+  $('#rsBars').innerHTML = bars;
+}
+
+function finish(){
+  renderResult();
+  showView('result');
+}
+
+/* ================= 分享 ================= */
+function buildCopyText(){
+  const {code, type} = compute();
+  return `我穿越进了宝可梦世界，我的初始宝可梦是「${type.poke}」！\n`+
+         `人格标签：${code} · ${type.role}\n`+
+         `不是谁都能遇到命定的那只精灵 —— 测测你在宝可梦世界是谁。`;
+}
+function copyText(){
+  const txt = buildCopyText();
+  const done = ()=>toast('已复制分享文案，去粘贴吧');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt, done));
+  } else { fallbackCopy(txt, done); }
+}
+function fallbackCopy(txt, done){
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ toast('复制失败，请手动长按选择文案'); }
+  document.body.removeChild(ta);
+}
+
+/* 把图片读成 dataURL，避免 canvas 被污染（file:// 下不可用则走截图提示） */
+function loadAsDataURL(src){
+  return fetch(src).then(r=>r.blob()).then(b=>new Promise((res,rej)=>{
+    const fr = new FileReader();
+    fr.onload = ()=>res(fr.result);
+    fr.onerror = rej;
+    fr.readAsDataURL(b);
+  }));
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function drawRadarCanvas(ctx, cx, cy, R, data){
+  const n = data.length;
+  const pt = (i,ratio)=>{
+    const a = (-90 + i*(360/n))*Math.PI/180;
+    return [cx + R*ratio*Math.cos(a), cy + R*ratio*Math.sin(a)];
+  };
+  // rings
+  ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,.12)';
+  [0.25,0.5,0.75,1].forEach(r=>{
+    ctx.beginPath();
+    for(let i=0;i<=n;i++){ const [x,y]=pt(i%n,r); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+    ctx.closePath(); ctx.stroke();
+  });
+  // spokes
+  ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,255,255,.08)';
+  for(let i=0;i<n;i++){ const [x,y]=pt(i,1); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke(); }
+  // data polygon
+  ctx.beginPath();
+  for(let i=0;i<n;i++){ const [x,y]=pt(i,data[i].v/100); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);
+  grad.addColorStop(0,'rgba(255,77,109,.55)'); grad.addColorStop(1,'rgba(255,200,61,.55)');
+  ctx.fillStyle = grad; ctx.fill();
+  ctx.lineWidth = 4; ctx.strokeStyle = '#FF4D6D'; ctx.stroke();
+  // dots + labels
+  ctx.textAlign = 'center';
+  data.forEach((d,i)=>{
+    const [x,y]=pt(i,d.v/100);
+    ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2); ctx.fillStyle='#FFC83D'; ctx.fill();
+    const [lx,ly]=pt(i,1.22);
+    ctx.fillStyle='#7E8DB6'; ctx.font='800 34px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.fillText(d.lab, lx, ly+12);
+    const [vx,vy]=pt(i,1.44);
+    ctx.fillStyle='#F6F9FF'; ctx.font='700 28px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.fillText(d.v+'%', vx, vy+10);
+  });
+}
+function drawShareCard(){
+  const {code, type, detail} = compute();
+  const dr = DR[code] || {oak:type.why, cheer:'愿你的每一份坚持，都成为更好的自己。'};
+  const pSrc = $('#rsImg').getAttribute('src');
+  if(!pSrc){ toast('图片未就绪，请长按结果卡截图保存'); return; }
+  loadAsDataURL(pSrc).then(pdata=>{
+    const pimg = new Image();
+    pimg.onload = ()=>{ try{ render(pimg); }catch(e){ toast('本地打开无法导出图片，请在结果卡上长按截图保存'); } };
+    pimg.onerror = ()=>{ toast('图片加载失败，请长按截图保存'); };
+    pimg.src = pdata;
+  }).catch(()=>{ toast('本地打开无法导出图片，请在结果卡上长按截图保存'); });
+  function render(pimg){
+    const cv = $('#shareCanvas');
+    const ctx = cv.getContext('2d');
+    const W = cv.width, H = cv.height;
+    const wrapTxt=(txt,maxW)=>{const a=[];let line='';txt.split('').forEach(ch=>{if(ctx.measureText(line+ch).width>maxW){a.push(line);line=ch;}else line+=ch;});if(line)a.push(line);return a;};
+    const rr=(x,y,w,h,r)=>{ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();};
+    const star=(cx,cy,r,ratio)=>{const pt=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rad=i%2?r*.5:r;pt.push(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad);}ctx.beginPath();ctx.moveTo(pt[0],pt[1]);for(let i=2;i<pt.length;i+=2)ctx.lineTo(pt[i],pt[i+1]);ctx.closePath();ctx.fillStyle='#E8DDC0';ctx.fill();if(ratio>0){ctx.save();ctx.clip();ctx.fillStyle='#F5B83D';ctx.fillRect(cx-r,cy-r,r*2,r*2);ctx.restore();}};
+    const heart=(cx,cy,s)=>{ctx.save();ctx.translate(cx,cy);ctx.scale(s/24,s/24);ctx.beginPath();ctx.moveTo(12,21);ctx.bezierCurveTo(4.5,15.6,-0.5,9.6,2.1,5.4);ctx.bezierCurveTo(4.2,2.2,8.4,2,12,5.4);ctx.bezierCurveTo(15.6,2,19.8,2.2,21.9,5.4);ctx.bezierCurveTo(24.5,9.6,19.5,15.6,12,21);ctx.closePath();ctx.fill();ctx.restore();};
+    // 米纸底 + 纸纹 + 描边
+    ctx.fillStyle='#F4ECDD';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(120,95,55,.13)';for(let i=0;i<H;i+=22){for(let j=0;j<W;j+=22){ctx.fillRect(j,i,1.6,1.6);}}
+    ctx.strokeStyle='rgba(120,95,55,.32)';ctx.lineWidth=4;rr(24,24,W-48,H-48,40);ctx.stroke();
+    // 四角胶带 + 右下图钉
+    const tape=(x,y,ang,w,h)=>{ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.globalAlpha=.85;ctx.fillStyle='#D8C79A';ctx.fillRect(-w/2,-h/2,w,h);ctx.globalAlpha=1;ctx.restore();};
+    tape(96,64,-0.18,120,46);tape(W-96,64,0.18,120,46);tape(104,H-86,-0.16,130,46);
+    ctx.save();ctx.translate(W-118,H-98);ctx.fillStyle='#8A7AE8';ctx.beginPath();ctx.arc(0,0,20,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(-8,-9,6,0,Math.PI*2);ctx.fill();ctx.restore();
+    // kick
+    ctx.textAlign='center';ctx.fillStyle='#8A6D3B';ctx.font='800 34px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.fillText('RESULT · 结果揭晓', W/2, 140);
+    // 精灵球挂饰(竖排标签顶)
+    ctx.save();ctx.translate(100,246);ctx.beginPath();ctx.arc(0,0,28,Math.PI,0);ctx.fillStyle='#FF4D6D';ctx.fill();ctx.beginPath();ctx.arc(0,0,28,0,Math.PI);ctx.fillStyle='#fff';ctx.fill();ctx.fillStyle='#7A3A2A';ctx.fillRect(-3,-3,6,3);ctx.beginPath();ctx.arc(0,0,3.4,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.restore();
+    // 竖排标签
+    ctx.save();ctx.translate(100,455);ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center';ctx.fillStyle='#5A3A1A';ctx.font='900 46px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.fillText(type.poke+'·'+code, 0, 0);ctx.restore();
+    // 水滴(标签下)
+    ctx.save();ctx.translate(100,660);ctx.beginPath();ctx.moveTo(0,-24);ctx.bezierCurveTo(16,-2,22,10,22,16);ctx.bezierCurveTo(22,28,12,36,0,36);ctx.bezierCurveTo(-12,36,-22,28,-22,16);ctx.bezierCurveTo(-22,10,-16,-2,0,-24);ctx.closePath();ctx.fillStyle='#4AA3DF';ctx.fill();ctx.restore();
+    // 宝可梦
+    const pokeSize=400, ox=W/2, oy=430;
+    const og=ctx.createRadialGradient(ox,oy,20,ox,oy,260);og.addColorStop(0,'rgba(120,200,220,.5)');og.addColorStop(1,'transparent');
+    ctx.fillStyle=og;ctx.beginPath();ctx.arc(ox,oy,260,0,Math.PI*2);ctx.fill();
+    ctx.drawImage(pimg, ox-pokeSize/2, oy-pokeSize/2, pokeSize, pokeSize);
+    // 爱心胶囊 role
+    const rw=680,rh=96,rcx=W/2,rcy=745;
+    ctx.fillStyle='#FFF0E6';rr(rcx-rw/2,rcy-rh/2,rw,rh,rh/2);ctx.fill();
+    ctx.strokeStyle='#E8574F';ctx.lineWidth=4;ctx.setLineDash([12,10]);rr(rcx-rw/2,rcy-rh/2,rw,rh,rh/2);ctx.stroke();ctx.setLineDash([]);
+    heart(rcx-rw/2-30,rcy,46);heart(rcx+rw/2+30,rcy,46);
+    ctx.fillStyle='#E8574F';ctx.font='900 44px "PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign='center';
+    ctx.fillText(type.role, rcx, rcy+16);
+    // 5 行：图标+特质名+星星+百分比+进度条
+    const bx=150,bw=W-300,btop=850,bgap=170;
+    const dimIcon={'EI':['E','#4AA3DF'],'SN':['S','#F5B83D'],'TF':['T','#E8574F'],'JP':['J','#8A7AE8'],'CS':['C','#3DBD9E']};
+    detail.forEach((d,i)=>{
+      const total=d.v1+d.v2;
+      const pct=total?Math.round((d.win===d.p1?d.v1:d.v2)/total*100):50;
+      const y=btop+i*bgap;
+      const [ic,icC]=dimIcon[d.a]||['?','#E8574F'];
+      ctx.fillStyle=icC+'33';ctx.beginPath();ctx.arc(bx+26,y,28,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=icC;ctx.font='900 32px "PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign='center';
+      ctx.fillText(ic, bx+26, y+12);
+      ctx.textAlign='left';ctx.fillStyle='#5A3A1A';ctx.font='800 36px "PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.fillText(CHIP[d.a][d.win], bx+70, y+12);
+      let sx=W-bx-250, sy=y+10, sr=26;
+      for(let s=0;s<5;s++){star(sx,sy,sr,Math.max(0,Math.min(1,pct/20-s)));sx+=54;}
+      ctx.fillStyle='#9A8A6A';ctx.font='700 32px "PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign='right';
+      ctx.fillText('('+pct+'%)', W-bx, sy+12);
+      ctx.fillStyle='#F1E7D4';rr(bx,y+38,bw,28,14);ctx.fill();
+      const fillW=Math.max(14,bw*pct/100);
+      ctx.save();rr(bx,y+38,fillW,28,14);ctx.clip();ctx.fillStyle=icC;ctx.fillRect(bx,y+38,fillW,28);ctx.restore();
+    });
+    // 博士便签
+    const nw=W-260,nx=130,ny=1660,nh=250;
+    ctx.save();ctx.translate(nx+nw/2,ny);ctx.rotate(-0.008);
+    ctx.fillStyle='#FFF9E8';rr(-nw/2,0,nw,nh,36);ctx.fill();
+    ctx.strokeStyle='#D8B06A';ctx.lineWidth=4;ctx.setLineDash([14,12]);rr(-nw/2,0,nw,nh,36);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#FF9E3D';ctx.beginPath();ctx.arc(0,-16,18,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(255,255,255,.6)';ctx.beginPath();ctx.arc(-7,-20,6,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    ctx.textAlign='center';ctx.fillStyle='#C98A2B';ctx.font='900 30px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.fillText('大木博士的图鉴笔记', W/2, ny+48);
+    ctx.fillStyle='#5A4A2A';ctx.font='500 30px "PingFang SC","Microsoft YaHei",sans-serif';
+    let ty=ny+108;
+    wrapTxt(dr.oak,nw-80).slice(0,2).forEach(ln=>{ctx.fillText(ln,W/2,ty);ty+=46;});
+    ctx.fillStyle='#33405E';ctx.font='700 30px "PingFang SC","Microsoft YaHei",sans-serif';
+    wrapTxt(dr.cheer,nw-80).slice(0,1).forEach(ln=>{ctx.fillText(ln,W/2,ty);ty+=46;});
+    // 训练家脚注 + 底部提示
+    ctx.fillStyle='#9A8A6A';ctx.font='600 28px "PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('训练家：@你的名字   生成我的专属守护者', W/2, ny+nh+44);
+    ctx.fillText('分享到 朋友圈 / 小红书 / 抖音', W/2, H-26);
+    // export
+    const url=cv.toDataURL('image/png');
+    const a=document.createElement('a');a.href=url;a.download='我的初始宝可梦_'+code+'.png';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast('分享卡已生成');
+  }
+}
+
+/* ================= 事件 ================= */
+$('#btnStart').addEventListener('click', ()=>{ buildQuestions(); renderQuestion(0); showView('quiz'); });
+$('#btnBack').addEventListener('click', ()=>{
+  if(cur>0){ renderQuestion(cur-1); } else { showView('intro'); }
+});
+$('#btnSave').addEventListener('click', drawShareCard);
+$('#btnCopy').addEventListener('click', copyText);
+$('#btnAgain').addEventListener('click', ()=>{
+  buildQuestions();
+  cur = 0;
+  showView('intro');
+});
+
+/* 首次渲染进度条复位 */
+window.addEventListener('load', ()=>{ $('#qBar').style.width = '0%'; });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+{
+  "src": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试\\_verify_result.html",
+  "url": "file:///C:/Users/%E9%99%88%E5%B9%BF%E8%BE%89/Doubao/chats/2026-10-29/new-chat/%E5%AE%9D%E5%8F%AF%E6%A2%A6%E4%BA%BA%E6%A0%BC%E6%B5%8B%E8%AF%95/_verify_result.html",
+  "outdir": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试\\_shots",
+  "include": [
+    "lint",
+    "screenshots",
+    "structure"
+  ],
+  "shots": {
+    "mobile": {
+      "screenshot": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试\\_shots\\_verify_result_mobile.jpg",
+      "screenshotBytes": 76999,
+      "truncated": false,
+      "structure": {
+        "title": "穿越宝可梦 · 你的初始宝可梦人格",
+        "firstH1": "",
+        "viewport": {
+          "w": 484,
+          "h": 707
+        },
+        "fullpage": {
+          "w": 484,
+          "h": 1157
+        },
+        "counts": {
+          "section": 3,
+          "h1": 0,
+          "h2": 0,
+          "img": 40,
+          "canvas": 1,
+          "svg": 41,
+          "links": 0,
+          "buttons": 5
+        }
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "horizontalOverflow": [],
+      "resourceErrors": [],
+      "reportSource": "cdp"
+    }
+  },
+  "engine": "chrome_cli",
+  "chromiumExec": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "engineDegraded": true,
+  "engineDegradedReason": "playwright 未装",
+  "elapsedSec": 7.06,
+  "schemaVersion": 2,
+  "status": "pass",
+  "engineInfo": {
+    "name": "chrome_cli",
+    "degraded": true,
+    "degradedReasons": [
+      "playwright 未装"
+    ]
+  },
+  "input": {
+    "original": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试\\_verify_result.html",
+    "resolvedPath": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试\\_verify_result.html",
+    "baseUrl": "file:///C:/Users/%E9%99%88%E5%B9%BF%E8%BE%89/Doubao/chats/2026-10-29/new-chat/%E5%AE%9D%E5%8F%AF%E6%A2%A6%E4%BA%BA%E6%A0%BC%E6%B5%8B%E8%AF%95/_verify_result.html",
+    "protocol": "file",
+    "cwd": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试",
+    "mediaMode": {
+      "reducedMotion": true
+    }
+  },
+  "artifacts": {
+    "screenshots": [
+      {
+        "viewport": "mobile",
+        "path": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试\\_shots\\_verify_result_mobile.jpg",
+        "size": 76999,
+        "visualCoverage": {
+          "complete": true,
+          "reason": null
+        }
+      }
+    ]
+  },
+  "summary": {
+    "blocker": 0,
+    "error": 0,
+    "warning": 0,
+    "info": 0
+  },
+  "findings": [],
+  "prioritizedActions": [],
+  "reportPath": "C:\\Users\\陈广辉\\Doubao\\chats\\2026-10-29\\new-chat\\宝可梦人格测试\\_shots\\report.json"
+}

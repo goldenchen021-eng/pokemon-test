@@ -1,0 +1,27 @@
+{
+ "keys": [
+  "src",
+  "url",
+  "outdir",
+  "include",
+  "shots",
+  "engine",
+  "chromiumExec",
+  "evalIgnored",
+  "engineDegraded",
+  "engineDegradedReason",
+  "elapsedSec",
+  "schemaVersion",
+  "status",
+  "engineInfo",
+  "input",
+  "artifacts",
+  "summary",
+  "findings",
+  "prioritizedActions",
+  "reportPath"
+ ],
+ "eval": null,
+ "consoleErrors": 0,
+ "consoleWarnings": 0
+}

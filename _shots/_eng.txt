@@ -1,0 +1,1 @@
+{"chromiumExec": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", "engineInfo": {"name": "chrome_cli", "degraded": true, "degradedReasons": ["playwright 未装"]}, "engine": "chrome_cli"}
