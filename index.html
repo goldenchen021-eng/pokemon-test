@@ -49,6 +49,21 @@ a{color:inherit}
 .bg .deco.d4{width:30px;height:30px;right:10%;bottom:26%;opacity:.28;animation-delay:1.7s}
 @keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
 
+/* ============ 背景音乐开关 ============ */
+.music-btn{position:fixed;right:14px;top:14px;z-index:99;width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(170deg,#fcf2dc,#f2e1bc);border:1px solid #e3cfa5;
+  box-shadow:0 6px 14px rgba(18,40,24,.30), inset 0 0 0 1px rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .25s var(--ease), box-shadow .25s}
+.music-btn:hover{transform:scale(1.08)}
+.music-btn .ic{width:22px;height:22px;color:#8a5a2a;pointer-events:none}
+.music-btn.playing{animation:musicPulse 1.6s ease-in-out infinite}
+.music-btn.playing .ic{color:#e23352}
+.music-btn.playing::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #ffd 0%, #ffc83d 70%);right:4px;bottom:4px;
+  box-shadow:0 0 6px rgba(255,200,61,.8)}
+@keyframes musicPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
 /* ============ app shell ============ */
 #app{position:relative;z-index:1;max-width:540px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .view{display:none;flex:1;flex-direction:column;padding:22px 20px 34px}
@@ -735,6 +750,7 @@ function renderQuestion(i){
     btn.addEventListener('click', ()=>{
       if(busy) return;
       busy = true;
+      const s=$('#sClick'); if(s){ s.currentTime=0; const pp=s.play(); if(pp&&pp.catch) pp.catch(()=>{}); }
       const pole = btn.dataset.p;
       answers[i] = pole;
       $('#qWrap').querySelectorAll('.opt').forEach(b=>b.classList.toggle('sel', b===btn));
@@ -940,12 +956,10 @@ function drawShareCard(){
   const dr = DR[code] || {oak:type.why, cheer:'愿你的每一份坚持，都成为更好的自己。'};
   const pSrc = $('#rsImg').getAttribute('src');
   if(!pSrc){ toast('图片未就绪，请长按结果卡截图保存'); return; }
-  loadAsDataURL(pSrc).then(pdata=>{
-    const pimg = new Image();
-    pimg.onload = ()=>{ try{ render(pimg); }catch(e){ toast('本地打开无法导出图片，请在结果卡上长按截图保存'); } };
-    pimg.onerror = ()=>{ toast('图片加载失败，请长按截图保存'); };
-    pimg.src = pdata;
-  }).catch(()=>{ toast('本地打开无法导出图片，请在结果卡上长按截图保存'); });
+  const pimg = new Image();
+  pimg.onload = ()=>{ try{ render(pimg); }catch(e){ toast('导出失败，请在结果卡上长按截图保存'); } };
+  pimg.onerror = ()=>{ toast('图片加载失败，请长按截图保存'); };
+  pimg.src = pSrc;
   function render(pimg){
     const cv = $('#shareCanvas');
     const ctx = cv.getContext('2d');
@@ -1049,6 +1063,46 @@ $('#btnAgain').addEventListener('click', ()=>{
 /* 首次渲染进度条复位 */
 window.addEventListener('load', ()=>{ $('#qBar').style.width = '0%'; });
 
+/* ================= 背景音乐 ================= */
+window.addEventListener('load', ()=>{
+  const bgm = $('#bgm'); const btn = $('#btnMusic'); const s = $('#sClick');
+  if(!bgm || !btn) return;
+  if(s){ s.volume = 0.35; }   // 点击音效音量调小
+  bgm.volume = 0.5;            // 背景音乐音量调小
+  let on = false;
+  function startMusic(){
+    if(on) return;
+    const p = bgm.play();
+    if(p && p.then){
+      p.then(()=>{ on=true; btn.classList.add('playing'); btn.setAttribute('aria-pressed','true'); btn.title='关闭背景音乐'; }).catch(()=>{});
+    } else {
+      on=true; btn.classList.add('playing'); btn.setAttribute('aria-pressed','true'); btn.title='关闭背景音乐';
+    }
+  }
+  function stopMusic(){
+    bgm.pause(); on=false; btn.classList.remove('playing'); btn.setAttribute('aria-pressed','false'); btn.title='开启背景音乐';
+  }
+  btn.addEventListener('click', ()=>{ if(!on){ startMusic(); } else { stopMusic(); } });
+  // 尽量自动播放：load 先尝试；被浏览器拦截时，等用户首次点击页面任意处自动响起
+  startMusic();
+  const firstTouch = (ev)=>{
+    document.removeEventListener('click', firstTouch, true);
+    document.removeEventListener('touchstart', firstTouch, true);
+    if(on) return;
+    if(ev.target && ev.target.closest && ev.target.closest('#btnMusic')) return;
+    startMusic();
+  };
+  document.addEventListener('click', firstTouch, true);
+  document.addEventListener('touchstart', firstTouch, true);
+});
+
 </script>
+<audio id="bgm" src="assets/bgm.wav" loop preload="auto"></audio>
+<audio id="sClick" src="assets/click.wav" preload="auto"></audio>
+<button id="btnMusic" class="music-btn" aria-label="背景音乐" aria-pressed="false" title="开启背景音乐">
+  <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>
+  </svg>
+</button>
 </body>
 </html>
